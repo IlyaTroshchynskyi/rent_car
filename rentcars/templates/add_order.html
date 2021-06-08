@@ -7,7 +7,10 @@
 {% block body %}
 
 <div class="col-md-6">
-  <form method="POST" action="#">
+    
+  <form method="POST" action="">
+      {{ form.hidden_tag() }}
+    <fieldset class="form-group">
     <div class="form-group row">
       {{ form.car_number.label(class='control-label col-form-label-sm col-sm-3' ) }}
         {% if form.car_number.errors %}
@@ -121,12 +124,12 @@
             </div>
           {% endif %}
       </div>
-
+    </fieldset>
       <div class="form-group row ml-2">
         {{ form.submit(class="btn btn-success") }}
       </div>
 
-        </form>
+    </form>
 
     </div>
 {% endblock %}
