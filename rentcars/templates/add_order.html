@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Add Order
+{% endblock %}
+
+{% block body %}
+
+<div class="col-md-6">
+    <form action="#" method="post">
+        {% for field in form %}
+        <div class="form-group row">
+            {{field.label(class='control-label col-form-label-sm col-sm-3' ) }}
+            <div class="col-sm-8">
+            {{field(class='form-control sm') }}
+            </div>
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success">Create</button>
+    </form>
+
+
+{% endblock %}

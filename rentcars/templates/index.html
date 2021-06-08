@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Orders List
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+      <div class="col-sm-11">
+        <table class="table table-hover">
+            <thead class="thead-dark"> 
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Car number</th>
+                <th scope="col">Client passport number</th>
+                <th scope="col">Add date</th>
+                <th scope="col">Rental time</th>
+                <th scope="col">Rental cost</th>
+                <th scope="col">Total cost</th>
+              </tr>
+            </thead>
+           
+            <tbody>
+              {% for row in orders %}
+              <tr>
+                <th scope="row">{{row.id}}</th>
+                <td>{{ row.car_number }}</td>
+                <td>{{ row.client_passport }}</td>
+                <td>{{ row.date_rent }}</td>
+                <td>{{ row.rental_time }}</td>
+                <td>{{ row.rental_cost }}</td>
+                <td>{{ row.total_cost }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            
+          </table>
+      </div>
+      <div class="col-sm-1">col-sm-2</div>
+    </div>
+
+  </div>
+
+{% endblock %}
