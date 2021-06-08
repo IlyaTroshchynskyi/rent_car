@@ -5,8 +5,8 @@ from datetime import datetime
 class Orders(db.Model):
     __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
-    car_number = db.Column(db.String(10), unique=True)
-    client_passport = db.Column(db.String(10), unique=True)
+    car_number = db.Column(db.String(10))
+    client_passport = db.Column(db.String(10))
     date_rent = db.Column(db.DateTime, nullable=False, default=datetime.now())
     rental_time = db.Column(db.Integer, nullable=False)
     rental_cost = db.Column(db.Float)
