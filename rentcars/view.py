@@ -17,13 +17,6 @@ def add_order():
     form = AddOrder()
     print('**************')
     if form.validate_on_submit():
-        # car_number = db.Column(db.String(10), unique=True)
-        # client_passport = db.Column(db.String(10), unique=True)
-        # date_rent = db.Column(db.DateTime, nullable=False, default=datetime.now())
-        # rental_time = db.Column(db.Integer, nullable=False)
-        # rental_cost = db.Column(db.Float)
-        # total_cost = db.Column(db.Float)
-        # car = db.relations
         print('////////////')
         car = Cars.query.filter_by(car_number=form.car_number.data).first()
         order = Orders(car_number=form.car_number.data,
@@ -38,3 +31,18 @@ def add_order():
         flash('Your order was created successful', 'success')
         return redirect(url_for('index'))
     return render_template('add_order.html', form=form)
+
+
+@app.route("/delete/<id_order>", methods=['GET', 'POST'])
+def delete_order(id_order):
+    order = Orders.query.get_or_404(id_order)
+    db.session.delete(order)
+    db.session.commit()
+    flash('Your order was deleted successfully', 'success')
+    return redirect(url_for('index'))
+
+
+@app.route("/cars", methods=['GET', 'POST'])
+def show_cars():
+    cars = Cars.query.all()
+    return render_template('index.html', cars=cars)
