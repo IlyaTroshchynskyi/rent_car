@@ -3,6 +3,7 @@ from wtforms import StringField, SubmitField, FloatField
 from wtforms.validators import InputRequired, Length, NumberRange, ValidationError
 from wtforms.fields.html5 import DateField
 from flask_wtf import FlaskForm
+from models import Cars, Orders
 
 
 class AddOrder(FlaskForm):
@@ -23,6 +24,14 @@ class AddOrder(FlaskForm):
     def validate_order_date(form, field):
         if not field.data > datetime.date.today():
             raise ValidationError('The day must be no less then current')
+
+    def validate_car_number(form, field):
+        car = Cars.query.filter_by(car_number=field.data).first()
+        print(car)
+        order = Orders.query.filter_by(car_number=field.data).first()
+        if car is None or (order and order.car_number == field.data \
+                and order.date_rent.date() == form.order_date.data):
+            raise ValidationError('This car is unavailable for that day or not in database')
 
 
 class AddCar(FlaskForm):
