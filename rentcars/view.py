@@ -7,8 +7,8 @@ from forms import AddOrder, AddCar
 
 @app.route('/')
 def index():
-    orders = Orders.query.all()
-
+    # orders = Orders.query.all()
+    orders = []
     return render_template('index.html', orders=orders)
 
 
@@ -44,7 +44,8 @@ def delete_order(id_order):
 
 @app.route("/cars", methods=['GET', 'POST'])
 def show_cars():
-    cars = Cars.query.all()
+    # cars = Cars.query.all()
+    cars = []
     return render_template('cars.html', cars=cars)
 
 
@@ -78,5 +79,10 @@ def update_order(order_id):
         form.date_rent.data = order.date_rent
         form.rental_time.data = order.rental_time
 
-
     return render_template('add_order.html', form=form)
+
+
+@app.route("/clients", methods=['GET', 'POST'])
+def show_clients():
+    clients = []
+    return render_template('clients.html', clients=clients)
