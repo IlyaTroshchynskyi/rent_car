@@ -7,19 +7,17 @@ from forms import AddOrder, AddCar, AddClient
 
 @app.route('/')
 def index():
-    # orders = Orders.query.all()
-    orders = []
+    orders = Orders.query.all()
     return render_template('index.html', orders=orders)
 
 
 @app.route("/add_order", methods=['GET', 'POST'])
 def add_order():
     form = AddOrder()
-    print('**************')
     if form.validate_on_submit():
-        print('////////////')
         car = Cars.query.filter_by(car_number=form.car_number.data).first()
         order = Orders(car_number=form.car_number.data,
+                       car_description=form.car_description.data,
                        client_passport=form.client_passport.data,
                        date_rent=form.order_date.data,
                        rental_time=form.rental_time.data,
@@ -27,15 +25,18 @@ def add_order():
                        total_cost=form.rental_time.data * car.rental_cost)
         db.session.add(order)
         db.session.commit()
-        print(order)
+        car.number_orders += 1
+        client = Clients.query.filter_by(passport=form.client_passport.data).first()
+        client.number_orders += 1
+        db.session.commit()
         flash('Your order was created successful', 'success')
         return redirect(url_for('index'))
     return render_template('add_order.html', form=form)
 
 
-@app.route("/delete/<id_order>", methods=['GET', 'POST'])
-def delete_order(id_order):
-    order = Orders.query.get_or_404(id_order)
+@app.route("/delete/<order_id>", methods=['GET', 'POST'])
+def delete_order(order_id):
+    order = Orders.query.get_or_404(order_id)
     db.session.delete(order)
     db.session.commit()
     flash('Your order was deleted successfully', 'success')
@@ -52,9 +53,7 @@ def show_cars():
 def add_car():
     form = AddCar()
     car = Cars.query.filter_by(car_number=form.car_number.data).first()
-    print('**************')
-    if form.validate_on_submit() and not car:
-        print('////////////')
+    if form.validate_on_submit() and car is None:
         car = Cars(car_number=form.car_number.data,
                        car_description=form.car_description.data,
                        rental_cost=form.rental_cost.data)
@@ -71,7 +70,7 @@ def update_order(order_id):
     form = AddOrder()
     if request.method == 'GET':
         form.car_number.data = order.car_number
-        # form.car_description.data = order.car_description
+        form.car_description.data = order.car_description
         form.client_passport.data = order.client_passport
         form.client_name.data = order.client_name
         form.date_rent.data = order.date_rent
