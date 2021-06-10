@@ -1,0 +1,32 @@
+{% from 'macro_render_field_form.html' import render_field %}
+{% extends 'base.html' %}
+
+{% block title %}
+    Add Order
+{% endblock %}
+
+{% block header %}
+  <header>
+      <h2>Add Car</h2>
+  </header>
+{% endblock %}
+
+{% block body %}
+
+<div class="col-md-6">
+    
+  <form method="POST" action="">
+      {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+        {{ render_field(form.car_number) }}
+        {{ render_field(form.car_description) }}
+        {{ render_field(form.rental_cost) }}
+    </fieldset>
+      <div class="form-group row ml-2">
+        {{ form.submit(class="btn btn-success") }}
+      </div>
+
+    </form>
+
+    </div>
+{% endblock %}
