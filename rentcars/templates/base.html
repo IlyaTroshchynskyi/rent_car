@@ -15,9 +15,11 @@
     </title>
   </head>
   <body>
+  {% block header %}
   <header>
       <h2>Orders List</h2>
     </header>
+  {% endblock %}
         <ul class="nav nav-tabs bg-dark">
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('index') }}">Orders</a>
@@ -26,11 +28,13 @@
               <a class="nav-link" href="#">Clients</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Cars</a>
+                <a class="nav-link" href="{{ url_for('show_cars') }}">Cars</a>
             </li>
+            {% block route %}
             <li class="nav-item item-right">
-              <a class="nav-link" href="{{ url_for('add_order') }}">Add</a>
+              <a class="nav-link" href="{{ url_for('add_order') }}">Add Order</a>
             </li>
+            {% endblock %}
       </ul>
       <div class="choose-date">
         <form method="post">
