@@ -36,6 +36,7 @@
             </li>
             {% endblock %}
       </ul>
+
       <div class="choose-date">
         <form method="post">
           <div class="data-filter"><label>  date from:  </label><input type="date" name="calendar_start" value="{{start}}"></div>
@@ -45,7 +46,18 @@
           </div>
         </form>
       </div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="row justify-content-center alert alert-{{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
       {% block body %}
+
 
     {% endblock body %}
  
