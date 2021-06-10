@@ -1,0 +1,33 @@
+{% from 'macro_render_field_form.html' import render_field %}
+{% extends 'base.html' %}
+
+{% block title %}
+    Add Client
+{% endblock %}
+
+{% block header %}
+  <header>
+      <h2>Add Client</h2>
+  </header>
+{% endblock %}
+
+{% block body %}
+
+<div class="col-md-6">
+    
+  <form method="POST" action="">
+      {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+        {{ render_field(form.first_name) }}
+        {{ render_field(form.last_name) }}
+        {{ render_field(form.client_passport) }}
+        {{ render_field(form.register_date) }}
+    </fieldset>
+      <div class="form-group row ml-2">
+        {{ form.submit(class="btn btn-success") }}
+      </div>
+
+    </form>
+
+    </div>
+{% endblock %}
