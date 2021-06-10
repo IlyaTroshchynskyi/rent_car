@@ -1,8 +1,8 @@
 from app import app
 from flask import render_template, url_for, redirect, flash, request
-from models import Orders, Cars
+from models import Orders, Cars, Clients
 from app import db
-from forms import AddOrder, AddCar
+from forms import AddOrder, AddCar, AddClient
 
 
 @app.route('/')
@@ -44,26 +44,24 @@ def delete_order(id_order):
 
 @app.route("/cars", methods=['GET', 'POST'])
 def show_cars():
-    # cars = Cars.query.all()
-    cars = []
+    cars = Cars.query.all()
     return render_template('cars.html', cars=cars)
 
 
 @app.route("/add_car", methods=['GET', 'POST'])
 def add_car():
     form = AddCar()
+    car = Cars.query.filter_by(car_number=form.car_number.data).first()
     print('**************')
-    if form.validate_on_submit():
+    if form.validate_on_submit() and not car:
         print('////////////')
-        car = Cars.query.filter_by(car_number=form.car_number.data).first()
         car = Cars(car_number=form.car_number.data,
-                       car_descripion=form.car_description.data,
-                       rental_cost=form.rental_cost.data,
-                       count_orders=form.count_orders.data)
+                       car_description=form.car_description.data,
+                       rental_cost=form.rental_cost.data)
         db.session.add(car)
         db.session.commit()
         flash('Your car was created successful', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('show_cars'))
     return render_template('add_car.html', form=form)
 
 
@@ -84,5 +82,19 @@ def update_order(order_id):
 
 @app.route("/clients", methods=['GET', 'POST'])
 def show_clients():
-    clients = []
+    clients = Clients.query.all()
     return render_template('clients.html', clients=clients)
+
+
+@app.route("/add_client", methods=['GET', 'POST'])
+def add_client():
+    form = AddClient()
+
+    if form.validate_on_submit():
+        client = Clients(first_name=form.first_name.data, last_name=form.last_name.data,
+                         passport=form.client_passport.data, register_date=form.register_date.data)
+        db.session.add(client)
+        db.session.commit()
+        flash('The client was successfully added', 'success')
+        return redirect(url_for('show_clients'))
+    return render_template('add_client.html', form=form)
