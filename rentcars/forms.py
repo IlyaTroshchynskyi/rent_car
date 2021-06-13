@@ -46,7 +46,7 @@ class AddCar(FlaskForm):
         Length(min=3, max=90, message="Car description have to be from 3 to 90 characters")])
     rental_cost = FloatField('Rental Cost', validators=[InputRequired(),
         NumberRange(min=1, message="Should contain numbers from 1")])
-    submit = SubmitField('Add Car')
+
 
 
 class AddClient(FlaskForm):
@@ -57,7 +57,6 @@ class AddClient(FlaskForm):
     client_passport = StringField('Client Passport', validators=[InputRequired(),
         Length(min=4, max=10, message="The passport have to be from 4 to 10 characters")])
     register_date = DateField('Register Date', validators=[InputRequired()])
-    submit = SubmitField('Add Client')
 
     def validate_register_date(form, field):
         if not field.data >= datetime.date.today():
