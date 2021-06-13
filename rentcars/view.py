@@ -1,3 +1,5 @@
+from datetime import datetime
+import math
 from app import app
 from flask import render_template, url_for, redirect, flash, request
 from models import Orders, Cars, Clients
@@ -5,10 +7,18 @@ from app import db
 from forms import AddOrder, AddCar, AddClient
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    if request.method == 'POST':
+        start = datetime.strptime(request.form['calendar_start'], "%Y-%m-%d").date()
+        end = datetime.strptime(request.form['calendar_end'], "%Y-%m-%d").date()
+        orders = Orders.query.filter(Orders.date_rent.between(start, end))
+        return render_template('index.html', orders=orders, start=start, end=end)
+    # start = datetime(1970, 12, 31, 0, 0, 0)
+    start = datetime.strptime('31-12-1970', "%d-%m-%Y").date()
+    end = datetime.strptime('31-12-2100', "%d-%m-%Y").date()
     orders = Orders.query.all()
-    return render_template('index.html', orders=orders)
+    return render_template('index.html', orders=orders, start=start, end=end)
 
 
 @app.route("/add_order", methods=['GET', 'POST'])
@@ -78,8 +88,18 @@ def delete_order(order_id):
 
 @app.route("/cars", methods=['GET', 'POST'])
 def show_cars():
+    if request.method == 'POST':
+        filter_from = math.ceil(float(request.form['cost_from']))
+        filter_to = math.ceil(float(request.form['cost_to']))
+        print(filter_to)
+        cars = Cars.query.filter(Cars.rental_cost.between(filter_from, filter_to))
+        return render_template('cars.html', cars=cars, filter_from=filter_from,
+                               filter_to=filter_to)
     cars = Cars.query.all()
-    return render_template('cars.html', cars=cars)
+    filter_from = 0
+    filter_to = 1_000
+    return render_template('cars.html', cars=cars, filter_from=filter_from,
+                               filter_to=filter_to)
 
 
 @app.route("/add_car", methods=['GET', 'POST'])
@@ -126,8 +146,15 @@ def delete_car(car_id):
 
 @app.route("/clients", methods=['GET', 'POST'])
 def show_clients():
+    if request.method == 'POST':
+        start = datetime.strptime(request.form['calendar_start'], "%Y-%m-%d").date()
+        end = datetime.strptime(request.form['calendar_end'], "%Y-%m-%d").date()
+        clients = Clients.query.filter(Clients.register_date.between(start, end))
+        return render_template('clients.html', clients=clients, start=start, end=end)
+    start = datetime.strptime('31-12-1970', "%d-%m-%Y").date()
+    end = datetime.strptime('31-12-2100', "%d-%m-%Y").date()
     clients = Clients.query.all()
-    return render_template('clients.html', clients=clients)
+    return render_template('clients.html', clients=clients, start=start, end=end)
 
 
 @app.route("/add_client", methods=['GET', 'POST'])
