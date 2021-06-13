@@ -31,22 +31,40 @@ def add_order():
         db.session.commit()
         flash('Your order was created successful', 'success')
         return redirect(url_for('index'))
-    return render_template('add_order.html', form=form)
+    return render_template('add_order.html', form=form, title='Add order')
 
 
 @app.route("/update_order/<order_id>", methods=['GET', 'POST'])
 def update_order(order_id):
     order = Orders.query.filter_by(id=order_id).first()
     form = AddOrder()
+    first_car_number = order.car_number
+    if form.validate_on_submit():
+        car = Cars.query.filter_by(car_number=form.car_number.data).first()
+        order.car_number = form.car_number.data
+        order.car_description = form.car_description.data
+        order.client_passport = form.client_passport.data
+        order.date_rent = form.order_date.data
+        order.rental_time = form.rental_time.data
+        order.rental_cost = car.rental_cost
+        order.total_cost = (form.rental_time.data * car.rental_cost)
+        if first_car_number != form.car_number.data:
+            car.number_orders -= 1
+            car = Cars.query.filter_by(car_number=first_car_number).first()
+            car.number_orders -= 1
+            car = Cars.query.filter_by(car_number=form.car_number.data).first()
+            car.number_orders += 1
+        db.session.commit()
+        flash('Your order was updated successful', 'success')
+        return redirect(url_for('index'))
     if request.method == 'GET':
         form.car_number.data = order.car_number
         form.car_description.data = order.car_description
         form.client_passport.data = order.client_passport
-        form.client_name.data = order.client_name
-        form.date_rent.data = order.date_rent
+        form.order_date.data = order.date_rent
         form.rental_time.data = order.rental_time
 
-    return render_template('add_order.html', form=form)
+    return render_template('add_order.html', form=form, title='Update order')
 
 
 @app.route("/delete_order/<order_id>", methods=['GET', 'POST'])
@@ -76,6 +94,25 @@ def add_car():
         db.session.commit()
         flash('Your car was created successful', 'success')
         return redirect(url_for('show_cars'))
+    return render_template('add_car.html', form=form)
+
+
+@app.route("/update_car/<car_id>", methods=['GET', 'POST'])
+def update_car(car_id):
+    car = Cars.query.filter_by(id=car_id).first()
+    form = AddCar()
+    if form.validate_on_submit():
+        car = Cars(car_number=form.car_number.data,
+                   car_description=form.car_description.data,
+                   rental_cost=form.rental_cost.data)
+        db.session.add(car)
+        db.session.commit()
+        flash('Your car was updated successful', 'success')
+        return redirect(url_for('show_cars'))
+    if request.method == 'GET':
+        form.car_number.data = car.car_number
+        form.car_description.data = car.car_description
+        form.rental_cost.data = car.rental_cost
     return render_template('add_car.html', form=form)
 
 
