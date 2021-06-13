@@ -34,7 +34,22 @@ def add_order():
     return render_template('add_order.html', form=form)
 
 
-@app.route("/delete/<order_id>", methods=['GET', 'POST'])
+@app.route("/update_order/<order_id>", methods=['GET', 'POST'])
+def update_order(order_id):
+    order = Orders.query.filter_by(id=order_id).first()
+    form = AddOrder()
+    if request.method == 'GET':
+        form.car_number.data = order.car_number
+        form.car_description.data = order.car_description
+        form.client_passport.data = order.client_passport
+        form.client_name.data = order.client_name
+        form.date_rent.data = order.date_rent
+        form.rental_time.data = order.rental_time
+
+    return render_template('add_order.html', form=form)
+
+
+@app.route("/delete_order/<order_id>", methods=['GET', 'POST'])
 def delete_order(order_id):
     order = Orders.query.get_or_404(order_id)
     db.session.delete(order)
@@ -64,19 +79,13 @@ def add_car():
     return render_template('add_car.html', form=form)
 
 
-@app.route("/update_order/<order_id>", methods=['GET', 'POST'])
-def update_order(order_id):
-    order = Orders.query.filter_by(id=order_id).first()
-    form = AddOrder()
-    if request.method == 'GET':
-        form.car_number.data = order.car_number
-        form.car_description.data = order.car_description
-        form.client_passport.data = order.client_passport
-        form.client_name.data = order.client_name
-        form.date_rent.data = order.date_rent
-        form.rental_time.data = order.rental_time
-
-    return render_template('add_order.html', form=form)
+@app.route("/delete_car/<car_id>", methods=['GET', 'POST'])
+def delete_car(car_id):
+    car = Cars.query.get_or_404(car_id)
+    db.session.delete(car)
+    db.session.commit()
+    flash('Car was deleted successfully', 'success')
+    return redirect(url_for('show_cars'))
 
 
 @app.route("/clients", methods=['GET', 'POST'])
@@ -97,3 +106,12 @@ def add_client():
         flash('The client was successfully added', 'success')
         return redirect(url_for('show_clients'))
     return render_template('add_client.html', form=form)
+
+
+@app.route("/delete_client/<client_id>", methods=['GET', 'POST'])
+def delete_client(client_id):
+    client = Clients.query.get_or_404(client_id)
+    db.session.delete(client)
+    db.session.commit()
+    flash('Client was deleted successfully', 'success')
+    return redirect(url_for('show_clients'))
