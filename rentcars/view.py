@@ -94,7 +94,7 @@ def add_car():
         db.session.commit()
         flash('Your car was created successful', 'success')
         return redirect(url_for('show_cars'))
-    return render_template('add_car.html', form=form)
+    return render_template('add_car.html', form=form, title='Add car')
 
 
 @app.route("/update_car/<car_id>", methods=['GET', 'POST'])
@@ -102,10 +102,9 @@ def update_car(car_id):
     car = Cars.query.filter_by(id=car_id).first()
     form = AddCar()
     if form.validate_on_submit():
-        car = Cars(car_number=form.car_number.data,
-                   car_description=form.car_description.data,
-                   rental_cost=form.rental_cost.data)
-        db.session.add(car)
+        car.car_number = form.car_number.data
+        car.car_description = form.car_description.data
+        car.rental_cost = form.rental_cost.data
         db.session.commit()
         flash('Your car was updated successful', 'success')
         return redirect(url_for('show_cars'))
@@ -113,7 +112,7 @@ def update_car(car_id):
         form.car_number.data = car.car_number
         form.car_description.data = car.car_description
         form.rental_cost.data = car.rental_cost
-    return render_template('add_car.html', form=form)
+    return render_template('add_car.html', form=form, title='Update car')
 
 
 @app.route("/delete_car/<car_id>", methods=['GET', 'POST'])
@@ -134,15 +133,35 @@ def show_clients():
 @app.route("/add_client", methods=['GET', 'POST'])
 def add_client():
     form = AddClient()
-
-    if form.validate_on_submit():
+    client = Clients.query.filter_by(passport=form.client_passport.data).first()
+    if form.validate_on_submit() and client is None:
         client = Clients(first_name=form.first_name.data, last_name=form.last_name.data,
                          passport=form.client_passport.data, register_date=form.register_date.data)
         db.session.add(client)
         db.session.commit()
         flash('The client was successfully added', 'success')
         return redirect(url_for('show_clients'))
-    return render_template('add_client.html', form=form)
+    return render_template('add_client.html', form=form, title='Add client')
+
+
+@app.route("/update_client/<client_id>", methods=['GET', 'POST'])
+def update_client(client_id):
+    client = Clients.query.filter_by(id=client_id).first()
+    form = AddClient()
+    if form.validate_on_submit():
+        client.first_name = form.first_name.data
+        client.last_name = form.last_name.data
+        client.passport = form.client_passport.data
+        client.register_date = form.register_date.data
+        db.session.commit()
+        flash('The client was successfully updated', 'success')
+        return redirect(url_for('show_clients'))
+    if request.method == 'GET':
+        form.first_name.data = client.first_name
+        form.last_name.data = client.last_name
+        form.client_passport.data = client.passport
+        form.register_date.data = client.register_date
+    return render_template('add_client.html', form=form, title='Update client')
 
 
 @app.route("/delete_client/<client_id>", methods=['GET', 'POST'])
