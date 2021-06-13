@@ -2,14 +2,21 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Add Order
+    {{ title }}
 {% endblock %}
 
 {% block header %}
   <header>
-      <h2>Add Order</h2>
+      <h2>{{ title }}</h2>
   </header>
   {% endblock %}
+
+{% block route %}
+    <li class="nav-item item-right">
+        <a class="nav-link" href="{{ url_for('index') }}">Cancel</a>
+    </li>
+{% endblock %}
+
 
 {% block body %}
 
@@ -21,12 +28,11 @@
         {{ render_field(form.car_number) }}
         {{ render_field(form.car_description) }}
         {{ render_field(form.client_passport) }}
-        {{ render_field(form.client_name) }}
         {{ render_field(form.order_date) }}
         {{ render_field(form.rental_time) }}
     </fieldset>
       <div class="form-group row ml-2">
-        {{ form.submit(class="btn btn-success") }}
+           <button class="btn btn-success">{{ title }}</button>
       </div>
 
     </form>
