@@ -32,7 +32,7 @@
             </thead>
 
             <tbody>
-              {% for row in clients %}
+              {% for row in clients.items %}
               <tr>
                 <th scope="row">{{row.id}}</th>
                 <td>{{ row.first_name }}</td>
@@ -70,6 +70,33 @@
     </div>
 
   </div>
+
+  <nav>
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li {% if not clients.has_prev %} class="page-item disabled" {% endif %}>
+          <a class="page-link" href="{{ url_for('clients.show_clients', page=clients.prev_num) }}">Previous</a>
+        </li>
+        {% for page_num in clients.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+          {% if page_num %}
+            {% if clients.page == page_num %}
+              <a class="btn btn-info mb-4" href="{{ url_for('clients.show_clients', page=page_num) }}">{{ page_num }}</a>
+                {% else %}
+              <a class="btn btn-outline-info mb-4" href="{{ url_for('clients.show_clients', page=page_num) }}">{{ page_num }}</a>
+                {% endif %}
+            {% else %}
+                ...
+            {% endif %}
+        {% endfor %}
+        <li {% if not clients.has_next %} class="page-item disabled" {% endif %}>
+          <a class="page-link" href="{{ url_for('clients.show_clients', page=clients.next_num) }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </nav>
+
+
+
 
 <script type="text/javascript">
 
