@@ -10,14 +10,18 @@ clients = Blueprint('clients', __name__)
 
 @clients.route("/clients", methods=['GET', 'POST'])
 def show_clients():
+    try:
+        page = request.args.get('page', 1, type=int)
+    except:
+        page = 1
     if request.method == 'POST':
         start = datetime.strptime(request.form['calendar_start'], "%Y-%m-%d").date()
         end = datetime.strptime(request.form['calendar_end'], "%Y-%m-%d").date()
-        clients = Clients.query.filter(Clients.register_date.between(start, end))
+        clients = Clients.query.filter(Clients.register_date.between(start, end)).paginate(page=1, per_page=1000)
         return render_template('clients.html', clients=clients, start=start, end=end)
     start = datetime.strptime('31-12-1970', "%d-%m-%Y").date()
     end = datetime.strptime('31-12-2100', "%d-%m-%Y").date()
-    clients = Clients.query.all()
+    clients = Clients.query.paginate(page=page, per_page=2)
     return render_template('clients.html', clients=clients, start=start, end=end)
 
 

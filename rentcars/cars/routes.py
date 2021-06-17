@@ -5,21 +5,25 @@ from rentcars.models import Cars
 from rentcars.cars.forms import AddCar
 
 
-
 cars = Blueprint('cars', __name__)
 
 
 @cars.route("/cars", methods=['GET', 'POST'])
 def show_cars():
+    filter_from = 0
+    filter_to = 1_000
+    try:
+        page = request.args.get('page', 1, type=int)
+    except:
+        page = 1
     if request.method == 'POST':
         filter_from = math.ceil(float(request.form['cost_from']))
         filter_to = math.ceil(float(request.form['cost_to']))
-        cars = Cars.query.filter(Cars.rental_cost.between(filter_from, filter_to))
+        cars = Cars.query.filter(Cars.rental_cost.between(filter_from,
+                                                          filter_to)).paginate(page=1, per_page=1000)
         return render_template('cars.html', cars=cars, filter_from=filter_from,
                                filter_to=filter_to)
-    cars = Cars.query.all()
-    filter_from = 0
-    filter_to = 1_000
+    cars = Cars.query.paginate(page=page, per_page=2)
     return render_template('cars.html', cars=cars, filter_from=filter_from,
                                filter_to=filter_to)
 

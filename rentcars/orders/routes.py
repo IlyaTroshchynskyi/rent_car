@@ -10,14 +10,18 @@ orders = Blueprint('orders', __name__)
 
 @orders.route('/', methods=['GET', 'POST'])
 def index():
+    try:
+        page = request.args.get('page', 1, type=int)
+    except:
+        page = 1
     if request.method == 'POST':
         start = datetime.strptime(request.form['calendar_start'], "%Y-%m-%d").date()
         end = datetime.strptime(request.form['calendar_end'], "%Y-%m-%d").date()
-        orders = Orders.query.filter(Orders.date_rent.between(start, end))
+        orders = Orders.query.filter(Orders.date_rent.between(start, end)).paginate(page=1, per_page=1000)
         return render_template('index.html', orders=orders, start=start, end=end)
     start = datetime.strptime('31-12-1970', "%d-%m-%Y").date()
     end = datetime.strptime('31-12-2100', "%d-%m-%Y").date()
-    orders = Orders.query.all()
+    orders = Orders.query.paginate(page=page, per_page=3)
     return render_template('index.html', orders=orders, start=start, end=end)
 
 
@@ -25,7 +29,6 @@ def index():
 def add_order():
     form = AddOrder()
     if form.validate_on_submit():
-        print(form.car_number.data.car_number)
         car = Cars.query.filter_by(car_number=form.car_number.data.car_number).first()
         order = Orders(car_number=form.car_number.data.car_number,
                        car_description=form.car_description.data.car_description,

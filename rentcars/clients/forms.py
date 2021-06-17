@@ -5,9 +5,10 @@ from wtforms.fields.html5 import DateField
 from flask_wtf import FlaskForm
 from rentcars.models import Clients
 
+
 class AddClient(FlaskForm):
     first_name = StringField('First name', validators=[InputRequired(),
-        Length(min=3, max=90,message="First name have to be from 3 to 45 characters")])
+        Length(min=3, max=90, message="First name have to be from 3 to 45 characters")])
     last_name = StringField('Last name', validators=[InputRequired(),
         Length(min=3, max=90, message="Last name have to be from 3 to 45 characters")])
     client_passport = StringField('Client Passport', validators=[InputRequired(),
