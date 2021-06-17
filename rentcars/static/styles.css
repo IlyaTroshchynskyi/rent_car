@@ -72,3 +72,26 @@ h2 {
       right: 0;
     }
    }
+
+   }
+.filter_cost {
+    height:150px;
+    margin:10px 10px 10px 10px;
+}
+
+.rental_cost_from, .rental_cost_from_by  {
+
+	display: inline-block;
+	min-width: 200px;
+
+}
+
+.filter-price{
+    height:30px;
+    display: inline-block;
+    border-radius:10px;
+    background: green;
+    float:right;
+
+
+}

@@ -22,25 +22,25 @@
   {% endblock %}
         <ul class="nav nav-tabs bg-dark">
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('index') }}">Orders</a>
+                <a class="nav-link" href="{{ url_for('orders.index') }}">Orders</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('show_clients') }}">Clients</a>
+              <a class="nav-link" href="{{ url_for('clients.show_clients') }}">Clients</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('show_cars') }}">Cars</a>
+                <a class="nav-link" href="{{ url_for('cars.show_cars') }}">Cars</a>
             </li>
             {% block route %}
             <li class="nav-item item-right">
-              <a class="nav-link" href="{{ url_for('add_order') }}">Add Order</a>
+              <a class="nav-link" href="{{ url_for('orders.add_order') }}">Add Order</a>
             </li>
             {% endblock %}
       </ul>
   {% block filter %}
       <div class="choose-date">
         <form action="" method="post">
-          <div class="data-filter"><label>  Date From:  </label><input type="date" name="calendar_start" value="{{start}}"></div>
-          <div class="data-filter"><label>  by:  </label><input type="date" name="calendar_end" value="{{end}}"> </div>
+          <div class="data-filter"><label>  Date From:  </label><input type="date" name="calendar_start" value="{{ start }}"></div>
+          <div class="data-filter"><label>  by:  </label><input type="date" name="calendar_end" value="{{ end }}"> </div>
           <div class="button-refresh data-filter">
           <button type="submit">Filter by date</button>
           </div>

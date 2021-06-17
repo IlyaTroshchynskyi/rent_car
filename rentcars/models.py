@@ -1,5 +1,6 @@
-from app import db
 from datetime import datetime
+from rentcars import db
+
 
 class Orders(db.Model):
 

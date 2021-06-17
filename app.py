@@ -1,11 +1,7 @@
-from flask import Flask, render_template
-from flask_sqlalchemy import SQLAlchemy
-from config import Configuration
-from flask_migrate import Migrate
+from rentcars import create_app
 
+app = create_app()
 
-app = Flask(__name__)
-app.config.from_object(Configuration)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-from models import *
+# app.app_context().push()
+if __name__ == '__main__':
+    app.run(debug=True)
