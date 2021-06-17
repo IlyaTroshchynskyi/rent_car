@@ -24,8 +24,7 @@ def show_clients():
 @clients.route("/add_client", methods=['GET', 'POST'])
 def add_client():
     form = AddClient()
-    client = Clients.query.filter_by(passport=form.client_passport.data).first()
-    if form.validate_on_submit() and client is None:
+    if form.validate_on_submit():
         client = Clients(first_name=form.first_name.data, last_name=form.last_name.data,
                          passport=form.client_passport.data, register_date=form.register_date.data)
         db.session.add(client)

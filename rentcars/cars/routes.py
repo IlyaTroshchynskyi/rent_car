@@ -27,14 +27,10 @@ def show_cars():
 @cars.route("/add_car", methods=['GET', 'POST'])
 def add_car():
     form = AddCar()
-    print(form,'***************************************************')
-    car = Cars.query.filter_by(car_number=form.car_number.data).first()
-    print(form.car_number.data)
-    if form.validate_on_submit() and car is None:
+    if form.validate_on_submit():
         car = Cars(car_number=form.car_number.data,
                        car_description=form.car_description.data,
                        rental_cost=form.rental_cost.data)
-        print(form.car_number.data, 'second-----------------------')
         db.session.add(car)
         db.session.commit()
         flash('Your car was created successful', 'success')

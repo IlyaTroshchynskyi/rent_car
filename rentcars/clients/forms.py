@@ -3,7 +3,7 @@ from wtforms import StringField
 from wtforms.validators import InputRequired, Length, ValidationError
 from wtforms.fields.html5 import DateField
 from flask_wtf import FlaskForm
-
+from rentcars.models import Clients
 
 class AddClient(FlaskForm):
     first_name = StringField('First name', validators=[InputRequired(),
@@ -17,3 +17,8 @@ class AddClient(FlaskForm):
     def validate_register_date(form, field):
         if not field.data >= datetime.date.today():
             raise ValidationError('The day must be no less then current')
+
+    def validate_client_passport(form, field):
+        car = Clients.query.filter_by(passport=field.data).first()
+        if car is not None:
+            raise ValidationError('This client is exist in database')

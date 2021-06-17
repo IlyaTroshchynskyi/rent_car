@@ -81,6 +81,11 @@ def update_order(order_id):
 @orders.route("/delete_order/<order_id>", methods=['GET', 'POST'])
 def delete_order(order_id):
     order = Orders.query.get_or_404(order_id)
+    try:
+        order.car.number_orders -= 1
+        order.client.number_orders -= 1
+    except:
+        pass
     db.session.delete(order)
     db.session.commit()
     flash('Your order was deleted successfully', 'success')
