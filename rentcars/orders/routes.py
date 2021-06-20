@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask import render_template, url_for, redirect, flash, request, Blueprint
+from flask_security import roles_accepted
 from rentcars import db
 from rentcars.models import Orders, Cars, Clients
 from rentcars.orders.forms import AddOrder
@@ -26,6 +27,7 @@ def index():
 
 
 @orders.route("/add_order", methods=['GET', 'POST'])
+@roles_accepted('admin', 'worker')
 def add_order():
     form = AddOrder()
     if form.validate_on_submit():
