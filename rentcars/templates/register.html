@@ -1,0 +1,35 @@
+{% from 'macro_render_field_form.html' import render_field %}
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block header %}
+  <header>
+      <h2>{{ title }}</h2>
+  </header>
+  {% endblock %}
+
+{% block body %}
+{% block filter %}
+{% endblock %}
+
+<div class="col-md-6">
+    
+  <form method="POST" action="">
+      {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+        {{ render_field(form.username) }}
+        {{ render_field(form.email) }}
+        {{ render_field(form.password) }}
+        {{ render_field(form.confirm_password) }}
+    </fieldset>
+      <div class="form-group row ml-2">
+           <button class="btn btn-success">{{ title }}</button>
+      </div>
+
+    </form>
+
+    </div>
+{% endblock %}
