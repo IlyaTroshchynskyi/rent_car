@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask import render_template, url_for, redirect, flash, request, Blueprint
+from flask_security import roles_accepted
 from rentcars import db
 from rentcars.models import Clients
 from rentcars.clients.forms import AddClient
@@ -9,6 +10,7 @@ clients = Blueprint('clients', __name__)
 
 
 @clients.route("/clients", methods=['GET', 'POST'])
+@roles_accepted('admin', 'worker')
 def show_clients():
     try:
         page = request.args.get('page', 1, type=int)
@@ -26,6 +28,7 @@ def show_clients():
 
 
 @clients.route("/add_client", methods=['GET', 'POST'])
+@roles_accepted('admin', 'worker')
 def add_client():
     form = AddClient()
     if form.validate_on_submit():
@@ -39,6 +42,7 @@ def add_client():
 
 
 @clients.route("/update_client/<client_id>", methods=['GET', 'POST'])
+@roles_accepted('admin', 'worker')
 def update_client(client_id):
     client = Clients.query.filter_by(id=client_id).first()
     form = AddClient()
@@ -59,6 +63,7 @@ def update_client(client_id):
 
 
 @clients.route("/delete_client/<client_id>", methods=['GET', 'POST'])
+@roles_accepted('admin', 'worker')
 def delete_client(client_id):
     client = Clients.query.get_or_404(client_id)
     db.session.delete(client)

@@ -51,6 +51,7 @@ def add_order():
 
 
 @orders.route("/update_order/<order_id>", methods=['GET', 'POST'])
+@roles_accepted('admin', 'worker')
 def update_order(order_id):
     order = Orders.query.filter_by(id=order_id).first()
     form = AddOrder()
@@ -84,6 +85,7 @@ def update_order(order_id):
 
 
 @orders.route("/delete_order/<order_id>", methods=['GET', 'POST'])
+@roles_accepted('admin', 'worker')
 def delete_order(order_id):
     order = Orders.query.get_or_404(order_id)
     try:

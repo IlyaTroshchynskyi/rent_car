@@ -1,5 +1,6 @@
 import math
 from flask import Blueprint, request, render_template, redirect, url_for, flash
+from flask_security import roles_accepted
 from rentcars import db
 from rentcars.models import Cars
 from rentcars.cars.forms import AddCar
@@ -9,6 +10,7 @@ cars = Blueprint('cars', __name__)
 
 
 @cars.route("/cars", methods=['GET', 'POST'])
+@roles_accepted('admin', 'worker')
 def show_cars():
     filter_from = 0
     filter_to = 1_000
@@ -29,6 +31,7 @@ def show_cars():
 
 
 @cars.route("/add_car", methods=['GET', 'POST'])
+@roles_accepted('admin', 'worker')
 def add_car():
     form = AddCar()
     if form.validate_on_submit():
@@ -43,6 +46,7 @@ def add_car():
 
 
 @cars.route("/update_car/<car_id>", methods=['GET', 'POST'])
+@roles_accepted('admin', 'worker')
 def update_car(car_id):
     car = Cars.query.filter_by(id=car_id).first()
     form = AddCar()
@@ -61,6 +65,7 @@ def update_car(car_id):
 
 
 @cars.route("/delete_car/<car_id>", methods=['GET', 'POST'])
+@roles_accepted('admin', 'worker')
 def delete_car(car_id):
     car = Cars.query.get_or_404(car_id)
     db.session.delete(car)
