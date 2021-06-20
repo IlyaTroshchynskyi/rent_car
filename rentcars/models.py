@@ -1,41 +1,7 @@
+from flask_security import UserMixin, RoleMixin
 from datetime import datetime
 from rentcars import db
 
-
-# class Orders(db.Model):
-#
-#     __tablename__ = 'orders'
-#     id = db.Column(db.Integer, primary_key=True)
-#     car_number = db.Column(db.String(10))
-#     car_description = db.Column(db.String(50), nullable=False)
-#     client_passport = db.Column(db.String(10))
-#     date_rent = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-#     rental_time = db.Column(db.Integer, nullable=False)
-#     rental_cost = db.Column(db.Float)
-#     total_cost = db.Column(db.Float)
-#     car = db.relationship('Cars', backref='cars', lazy=True)
-#     clients = db.relationship('Clients', backref='clients', lazy=True)
-#
-#
-# class Cars(db.Model):
-#
-#     __tablename__ = 'cars'
-#     id = db.Column(db.Integer, primary_key=True)
-#     car_number = db.Column(db.String(10), db.ForeignKey('orders.car_number'), unique=True)
-#     car_description = db.Column(db.String(50), nullable=False)
-#     rental_cost = db.Column(db.Float)
-#     number_orders = db.Column(db.Integer, default=0)
-#
-#
-# class Clients(db.Model):
-#
-#     __tablename__ = 'clients'
-#     id = db.Column(db.Integer, primary_key=True)
-#     first_name = db.Column(db.String(50), nullable=False)
-#     last_name = db.Column(db.String(50), nullable=False)
-#     passport = db.Column(db.String(10), db.ForeignKey('orders.client_passport'), unique=True)
-#     register_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-#     number_orders = db.Column(db.Integer, default=0)
 
 class Orders(db.Model):
 
@@ -60,6 +26,9 @@ class Cars(db.Model):
     number_orders = db.Column(db.Integer, default=0)
     order = db.relationship('Orders', backref='car', lazy=True)
 
+    def __repr__(self):
+        return self.car_number
+
 
 class Clients(db.Model):
 
@@ -71,3 +40,32 @@ class Clients(db.Model):
     register_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     number_orders = db.Column(db.Integer, default=0)
     order = db.relationship('Orders', backref='client', lazy=True)
+
+    def __repr__(self):
+        return self.passport
+
+
+roles_user = db.Table('roles_user',
+                      db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+                      db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+
+##Flask security
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50))
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(255))
+    active = db.Column(db.Boolean())
+    roles = db.relationship('Role', secondary=roles_user, backref=db.backref('users', lazy='dynamic'))
+
+    def __repr__(self):
+        return self.username
+
+
+class Role(db.Model, RoleMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True)
+    description = db.Column(db.String(255))
+
+    def __repr__(self):
+        return self.name
