@@ -17,6 +17,36 @@ login_manager = LoginManager()
 login_manager.login_view = 'users.login_page'
 
 
+
+class AdminMixin:
+    def is_accessible(self):
+        return current_user.has_role('admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('users.login_page', next=request.url))
+
+
+class ClientView(AdminMixin, ModelView):
+    can_export = True
+    page_size = 1
+
+
+class UsersView(AdminMixin, ModelView):
+    column_list = ['username', 'email', 'roles']
+    form_excluded_columns = ['password']
+    can_create = False
+
+
+class RolesView(AdminMixin, ModelView):
+    form_excluded_columns = ['users']
+
+
+class MainIndexLink(MenuLink):
+    def get_url(self):
+        return url_for("orders.index")
+
+
+
 def create_app(config_class=Configuration):
     app = Flask(__name__)
     app.config.from_object(Configuration)
@@ -26,25 +56,12 @@ def create_app(config_class=Configuration):
 
     from rentcars.models import Cars, Clients, Orders, User, Role
 
-    class ClientView(ModelView):
-        can_export = True
-        page_size = 1
-
-    class UsersView(ModelView):
-        column_list = ['username', 'email', 'roles']
-        form_excluded_columns = ['password']
-        can_create = False
-
-    class RolesView(ModelView):
-
-        form_excluded_columns = ['users']
-
-    class MainIndexLink(MenuLink):
-        def get_url(self):
-            return url_for("orders.index")
-
     admin.init_app(app=app)
     login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.get(int(user_id))
 
     admin.add_view(ModelView(Cars, db.session, endpoint='cars_admin'))
     admin.add_view(ClientView(Clients, db.session, endpoint='clients_admin'))

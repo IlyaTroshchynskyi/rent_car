@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, url_for, render_template, flash, request
-# from flask_login import login_user, login_required, logout_user
 from rentcars.users.forms import RegistrationForm, LoginForm
-from flask_security import current_user, logout_user, login_user, roles_accepted, roles_required
+from flask_login import current_user, logout_user, login_user
+# from flask_security import roles_accepted, roles_required,login_user, current_user, logout_user
 from rentcars import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from rentcars.models import User
