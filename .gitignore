@@ -5,3 +5,5 @@ __pycache__/
 rentcars/cars/__pycache__/
 rentcars/clients/__pycache__/
 rentcars/orders/__pycache__/
+tests/.pytest_cache
+tests

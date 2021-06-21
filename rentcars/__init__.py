@@ -1,7 +1,13 @@
+# -*- coding: utf-8 -*-
+"""config
+   Implements initialization of application.
+"""
+
+
 from flask import Flask, url_for, redirect, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_admin import Admin, AdminIndexView
+from flask_admin import Admin
 from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 from flask_security import SQLAlchemyUserDatastore, current_user, Security
@@ -11,14 +17,18 @@ from rentcars.config import Configuration
 
 db = SQLAlchemy()
 migrate = Migrate()
-admin = Admin(name='Rentcars', url='/admin', base_template='admin/update_admin_link.html')
+admin = Admin(name='Rentcars', url='/admin',
+              base_template='admin/update_admin_link.html')
 security = Security()
 login_manager = LoginManager()
 login_manager.login_view = 'users.login_page'
 
 
-
 class AdminMixin:
+    """
+    In the navigation menu, components that are not accessible to a
+    user who doesn't have role admin
+    """
     def is_accessible(self):
         return current_user.has_role('admin')
 
@@ -27,27 +37,42 @@ class AdminMixin:
 
 
 class ClientView(AdminMixin, ModelView):
+    """Customization admin panel. Can export tables into csv file and one item
+    placed on client view
+    """
     can_export = True
     page_size = 1
 
 
 class UsersView(AdminMixin, ModelView):
+    """Customization admin panel. Delete column with password to avoid look through password.
+    Delete opportunity create new users
+    """
     column_list = ['username', 'email', 'roles']
     form_excluded_columns = ['password']
     can_create = False
 
 
 class RolesView(AdminMixin, ModelView):
+    """Customization admin panel. Delete column with users.
+    """
     form_excluded_columns = ['users']
 
 
 class MainIndexLink(MenuLink):
+    """Customization admin panel. Added link to rentcars page.
+    """
     def get_url(self):
         return url_for("orders.index")
 
 
-
 def create_app(config_class=Configuration):
+    """Create and configure an instance of the Flask application.
+    Args:
+        config_class (class): Class with configuration
+    Returns:
+        app (obj): Return application
+    """
     app = Flask(__name__)
     app.config.from_object(Configuration)
 
@@ -77,7 +102,6 @@ def create_app(config_class=Configuration):
 
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
-
 
     app.register_blueprint(orders)
     app.register_blueprint(clients)

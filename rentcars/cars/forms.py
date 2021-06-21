@@ -7,7 +7,7 @@ from rentcars.models import Cars
 class AddCar(FlaskForm):
 
     car_number = StringField('Car Number', validators=[InputRequired(
-        message="Data for car number have to be provided")])
+        message="Data for cars number have to be provided")])
     car_description = StringField('Car Description', validators=[InputRequired(),
         Length(min=3, max=90, message="Car description have to be from 3 to 90 characters")])
     rental_cost = FloatField('Rental Cost', validators=[InputRequired(),
@@ -16,4 +16,4 @@ class AddCar(FlaskForm):
     def validate_car_number(form, field):
         car = Cars.query.filter_by(car_number=field.data).first()
         if car is not None:
-            raise ValidationError('This car is exist in database')
+            raise ValidationError('This cars is exist in database')
