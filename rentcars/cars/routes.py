@@ -3,10 +3,10 @@ from flask import Blueprint, request, render_template, redirect, url_for, flash
 from flask_security import roles_accepted
 from rentcars import db
 from rentcars.models import Cars
-from rentcars.cars.forms import AddCar
+from rentcars.car.forms import AddCar
 
 
-cars = Blueprint('cars', __name__)
+cars = Blueprint('car', __name__)
 
 
 @cars.route("/cars", methods=['GET', 'POST'])
@@ -23,10 +23,10 @@ def show_cars():
         filter_to = math.ceil(float(request.form['cost_to']))
         cars = Cars.query.filter(Cars.rental_cost.between(filter_from,
                                                           filter_to)).paginate(page=1, per_page=1000)
-        return render_template('cars.html', cars=cars, filter_from=filter_from,
+        return render_template('car.html', cars=cars, filter_from=filter_from,
                                filter_to=filter_to)
     cars = Cars.query.paginate(page=page, per_page=2)
-    return render_template('cars.html', cars=cars, filter_from=filter_from,
+    return render_template('car.html', cars=cars, filter_from=filter_from,
                                filter_to=filter_to)
 
 
@@ -41,7 +41,7 @@ def add_car():
         db.session.add(car)
         db.session.commit()
         flash('Your car was created successful', 'success')
-        return redirect(url_for('cars.show_cars'))
+        return redirect(url_for('car.show_cars'))
     return render_template('add_car.html', form=form, title='Add car')
 
 
@@ -56,7 +56,7 @@ def update_car(car_id):
         car.rental_cost = form.rental_cost.data
         db.session.commit()
         flash('Your car was updated successful', 'success')
-        return redirect(url_for('cars.show_cars'))
+        return redirect(url_for('car.show_cars'))
     if request.method == 'GET':
         form.car_number.data = car.car_number
         form.car_description.data = car.car_description
@@ -71,4 +71,4 @@ def delete_car(car_id):
     db.session.delete(car)
     db.session.commit()
     flash('Car was deleted successfully', 'success')
-    return redirect(url_for('cars.show_cars'))
+    return redirect(url_for('car.show_cars'))
