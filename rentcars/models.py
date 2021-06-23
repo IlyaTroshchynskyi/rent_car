@@ -3,8 +3,22 @@
    Implements the models for database tables.
 """
 from datetime import datetime
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer,\
+    SignatureExpired
 from flask_security import UserMixin, RoleMixin
-from rentcars import db
+from flask import current_app
+from rentcars import db, login_manager
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Reload the user object from the user ID stored in the session
+    Args:
+        user_id (str): User id
+    Returns:
+        user (obj): User
+    """
+    return User.get(int(user_id))
 
 
 class Orders(db.Model):
@@ -66,8 +80,8 @@ roles_user = db.Table('roles_user', db.Column('user_id',
 
 
 class User(db.Model, UserMixin):
-    """Table for saving users who work with this app. Have relationships with table role
-    many-to-many
+    """Table for saving users who work with this app. Have relationships
+     with table role many-to-many
     """
 
     id = db.Column(db.Integer, primary_key=True)
@@ -77,6 +91,29 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean())
     roles = db.relationship('Role', secondary=roles_user,
                             backref=db.backref('users', lazy='dynamic'))
+
+    def get_reset_token(self, expires_sec=1800):
+        """Help to change password using token
+        Returns:
+            token (str): Token
+        """
+        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_reset_token(token):
+        """Check if token doesn't expired
+        Args:
+            token (str): Token
+        Returns:
+            user (obj): User
+        """
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token)['user_id']
+        except SignatureExpired:
+            return None
+        return User.query.get(user_id)
 
     def __repr__(self):
         return self.username
