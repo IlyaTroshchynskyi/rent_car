@@ -2,8 +2,6 @@
 """config
    Implements initialization of application.
 """
-
-
 from flask import Flask, url_for, redirect, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -12,6 +10,7 @@ from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 from flask_security import SQLAlchemyUserDatastore, current_user, Security
 from flask_login import LoginManager
+from flask_mail import Mail
 from rentcars.config import Configuration
 
 
@@ -22,6 +21,7 @@ admin = Admin(name='Rentcars', url='/admin',
 security = Security()
 login_manager = LoginManager()
 login_manager.login_view = 'users.login_page'
+mail = Mail()
 
 
 class AdminMixin:
@@ -83,10 +83,7 @@ def create_app(config_class=Configuration):
 
     admin.init_app(app=app)
     login_manager.init_app(app)
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.get(int(user_id))
+    mail.init_app(app)
 
     admin.add_view(ModelView(Cars, db.session, endpoint='cars_admin'))
     admin.add_view(ClientView(Clients, db.session, endpoint='clients_admin'))
