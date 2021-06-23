@@ -13,3 +13,8 @@ class Configuration:
     SECRET_KEY = 'something_very_secret'
     SECURITY_PASSWORD_SALT = 'salt'
     SECURITY_PASSWORD_HASH = 'sha512_crypt'
+    MAIL_SERVER = 'smtp.googlemail.com'
+    MAIL_PORT = '587'
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = 'email'
+    MAIL_PASSWORD = 'password'
