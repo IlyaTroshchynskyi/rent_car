@@ -66,7 +66,7 @@ class AddOrder(BaseOrder):
 
     car_number = QuerySelectField('Car Number', validators=[InputRequired(
         message="Data for cars number have to be provided")],
-                                  query_factory=lambda: Cars.query.all,
+                                  query_factory=lambda: Cars.query.all(),
                                   get_label="car_number")
 
     car_description = QuerySelectField('Car Description',
