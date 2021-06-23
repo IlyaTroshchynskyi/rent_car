@@ -76,9 +76,11 @@ def reset_request():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         send_reset_email(user)
-        flash('An email has been sent with instructions to reset your password', 'info')
+        flash('An email has been sent with instructions to reset your '
+              'password', 'info')
         return redirect(url_for('users.login'))
-    return render_template('reset_request.html', title='Reset Password', form=form)
+    return render_template('reset_request.html', title='Reset Password',
+                           form=form)
 
 
 @users.route("/reset_password/<token>",  methods=['GET', 'POST'])
@@ -96,9 +98,11 @@ def reset_token(token):
         hashed_password = generate_password_hash(form.password.data)
         user.password = hashed_password
         db.session.commit()
-        flash(f'Your password has been updated! You are able to log in', 'success')
+        flash(f'Your password has been updated! You are able to log in',
+              'success')
         return redirect(url_for('users.login_page'))
-    return render_template('reset_token.html', title='Request Password', form=form)
+    return render_template('reset_token.html', title='Request Password',
+                           form=form)
 
 
 def send_reset_email(user):
@@ -109,6 +113,6 @@ def send_reset_email(user):
                   sender='noreply@demo.com', recipients=[user.email])
     msg.body = f""" To reset your password, visit the following link:
     {url_for('users.reset_token', token=token, _external=True)}
-    If you did not make this request then simply ignore this email and no change
+    If you didn't make this request then simply ignore this email and no change
     """
     mail.send(msg)
