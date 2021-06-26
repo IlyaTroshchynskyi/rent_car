@@ -2,7 +2,8 @@
 """routes
    Implements the routes blueprint users.
 """
-from flask import Blueprint, redirect, url_for, render_template, flash, request, current_app
+import logging
+from flask import Blueprint, redirect, url_for, render_template, flash, request
 from flask_login import current_user, logout_user, login_user
 from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,6 +13,7 @@ from rentcars import db, mail
 from rentcars.models import User
 
 
+logger = logging.getLogger("rentcars.users.routes")
 users = Blueprint('users', __name__)
 
 
@@ -29,6 +31,7 @@ def register():
                     password=hashed_password)
         db.session.add(user)
         db.session.commit()
+        logger.info(f'User with email={form.email.data} was register')
         flash('Your account has been created! You are able to log in',
               'success')
         return redirect(url_for('users.login_page'))
@@ -48,7 +51,7 @@ def login_page():
         if user and check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
-
+            logger.info(f'User with email={form.email.data} was logged in')
             flash('You have been logged in!', 'success')
             return redirect(next_page) if next_page else \
                 redirect(url_for('orders.index'))
@@ -76,6 +79,7 @@ def reset_request():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         send_reset_email(user)
+        logger.info(f'User with email={form.email.data} try to change password')
         flash('An email has been sent with instructions to reset your '
               'password', 'info')
         return redirect(url_for('users.login'))
@@ -91,6 +95,7 @@ def reset_token(token):
         return redirect(url_for('orders.index'))
     user = User.verify_reset_token(token)
     if user is None:
+        logger.info(f'User with token {token} expired or invalid')
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('users.reset_request'))
     form = ResetPasswordForm()
@@ -98,6 +103,7 @@ def reset_token(token):
         hashed_password = generate_password_hash(form.password.data)
         user.password = hashed_password
         db.session.commit()
+        logger.info(f'User with email={form.email.data} changed password')
         flash(f'Your password has been updated! You are able to log in',
               'success')
         return redirect(url_for('users.login_page'))

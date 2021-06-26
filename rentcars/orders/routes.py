@@ -2,25 +2,29 @@
 """routes
    Implements the routes for blueprint orders.
 """
+import logging
 from datetime import datetime
 from flask import render_template, url_for, redirect, flash, request, Blueprint
-from flask_security import roles_accepted
+from flask_security import roles_accepted, current_user
 from rentcars import db
 from rentcars.models import Orders, Cars, Clients
 from rentcars.orders.forms import AddOrder
 
 
+logger = logging.getLogger("rentcars.orders.routes")
 orders = Blueprint('orders', __name__)
 
 
 @orders.route('/', methods=['GET', 'POST'])
 def index():
-    """Show all orders. The application can filter and display a form to view the list of orders
+    """Show all orders. The application can filter and display a form
+     to view the list of orders
     with updated data. Paginate orders. Will be shown 1000 orders per page.
     """
     try:
         page = request.args.get('page', 1, type=int)
     except ValueError:
+        logger.error(f'You pass {page}. It is wrong type for page number')
         page = 1
     if request.method == 'POST':
         start = datetime.strptime(request.form['calendar_start'],
@@ -32,6 +36,7 @@ def index():
     start = datetime.strptime('31-12-1970', "%d-%m-%Y").date()
     end = datetime.strptime('31-12-2100', "%d-%m-%Y").date()
     orders = Orders.query.paginate(page=page, per_page=3)
+    logger.info(f'You are on the page={page}')
     return render_template('index.html', orders=orders, start=start, end=end)
 
 
@@ -63,6 +68,8 @@ def add_order():
                                          data.passport).first()
         client.number_orders += 1
         db.session.commit()
+        logger.info(f'Order was added with such param: {form.data} by user='
+                    f'{current_user}')
         flash('Your order was created successful', 'success')
         return redirect(url_for('orders.index'))
     return render_template('add_order.html', form=form, title='Add order')
@@ -78,21 +85,26 @@ def update_order(order_id):
     form = AddOrder()
     first_car_number = order.car_number
     if form.validate_on_submit():
-        car = Cars.query.filter_by(car_number=form.car_number.data).first()
-        order.car_number = form.car_number.data
-        order.car_description = form.car_description.data
-        order.client_passport = form.client_passport.data
+        car = Cars.query.filter_by(car_number=form.car_number.
+                                   data.car_number).first()
+        order.car_number = form.car_number.data.car_number
+        order.car_description = form.car_description.data.car_description
+        order.client_passport = form.client_passport.data.passport
         order.date_rent = form.order_date.data
         order.rental_time = form.rental_time.data
         order.rental_cost = car.rental_cost
         order.total_cost = (form.rental_time.data * car.rental_cost)
-        if first_car_number != form.car_number.data:
+        if first_car_number != form.car_number.data.car_number:
             car.number_orders -= 1
             car = Cars.query.filter_by(car_number=first_car_number).first()
             car.number_orders -= 1
-            car = Cars.query.filter_by(car_number=form.car_number.data).first()
+            car = Cars.query.filter_by(car_number=form.car_number.
+                                       data.car_number).first()
             car.number_orders += 1
         db.session.commit()
+        logger.info(f'Order with id={order_id} was updated with such'
+                    f' param:{form.data}'
+                    f'by user={current_user}')
         flash('Your order was updated successful', 'success')
         return redirect(url_for('orders.index'))
     if request.method == 'GET':
@@ -109,15 +121,17 @@ def update_order(order_id):
 @roles_accepted('admin', 'worker')
 def delete_order(order_id):
     """
-    View for deleting order from database. Have pop up menu for confirmation of deleting.
+    View for deleting order from database. Have pop up menu for
+    confirmation of deleting.
     """
     order = Orders.query.get_or_404(order_id)
     try:
         order.car.number_orders -= 1
         order.client.number_orders -= 1
-    except:
-        pass
+    except Exception as e:
+        logger.error(e)
     db.session.delete(order)
     db.session.commit()
+    logger.info(f'Order with id={order_id} was deleted by= {current_user}')
     flash('Your order was deleted successfully', 'success')
     return redirect(url_for('orders.index'))

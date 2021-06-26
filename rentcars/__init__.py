@@ -2,6 +2,7 @@
 """config
    Implements initialization of application.
 """
+import logging
 from flask import Flask, url_for, redirect, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -11,7 +12,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask_security import SQLAlchemyUserDatastore, current_user, Security
 from flask_login import LoginManager
 from flask_mail import Mail
-from rentcars.config import Configuration
+from rentcars.config import Configuration, init_logger
 
 
 db = SQLAlchemy()
@@ -73,6 +74,10 @@ def create_app(config_class=Configuration):
     Returns:
         app (obj): Return application
     """
+
+    init_logger('rentcars')
+    logger = logging.getLogger("rentcars.__init__")
+    logger.info('Start creating app rentcars')
     app = Flask(__name__)
     app.config.from_object(Configuration)
 
@@ -106,5 +111,7 @@ def create_app(config_class=Configuration):
     app.register_blueprint(cars)
     app.register_blueprint(users)
     app.register_blueprint(errors)
+
+    logger.info('Finished creating app rentcars')
 
     return app
