@@ -96,6 +96,7 @@ def create_app(config_class=Configuration):
     from rentcars.clients.routes import clients
     from rentcars.cars.routes import cars
     from rentcars.users.routes import users
+    from rentcars.errors.handlers import errors
 
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
@@ -104,5 +105,6 @@ def create_app(config_class=Configuration):
     app.register_blueprint(clients)
     app.register_blueprint(cars)
     app.register_blueprint(users)
+    app.register_blueprint(errors)
 
     return app
